@@ -25,6 +25,7 @@
           </li>
         </ul>
       </div>
+      <footer>Total todos: {{todos.length}} || {{todos.filter(x => x.complete).length}} completed</footer>
     </div>
   </div>
 </template>
@@ -67,6 +68,7 @@
   }
   li {
     margin: 5px 20px;
+    /*background-color: #d9534f;*/
   }
   a {
     color: #42b983;
@@ -74,5 +76,6 @@
   .complete {
     color: #bbb;
     text-decoration: line-through;
+
   }
 </style>
