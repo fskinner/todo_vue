@@ -9,7 +9,7 @@
               <label for="todoitem">Task</label>
               <input type="text" v-model="input" @keyup.enter="add" @keyup.esc="clear" class="form-control" id="todoitem" placeholder="Todo Item" />
             </div>
-            <button type="button" @click="add" class="btn btn-default">Create</button>
+            <button type="button" @click="add" class="btn btn-default">Add</button>
           </form>
         </div>
       </div>
@@ -19,8 +19,8 @@
         <h2>List</h2>
         <ul class="list-group">
           <li v-for="(todo, index) in todos" :key="index" class="list-group-item">
-            <span class="pull-left">{{ index }}</span>
-            {{ todo.description }}
+            <input type="checkbox" v-model="todo.complete" class="pull-left">
+            <span v-bind:class="{ complete: todo.complete }">{{ todo.description }}</span>
             <i @click="remove(index)" class="glyphicon glyphicon-remove pull-right"></i>
           </li>
         </ul>
@@ -34,7 +34,10 @@
     name: 'Todo',
     data () {
       return {
-        todos: [],
+        todos: [
+          { description: 'My first task', complete: true },
+          { description: 'Second', complete: false }
+        ],
         input: ''
       }
     },
@@ -67,5 +70,9 @@
   }
   a {
     color: #42b983;
+  }
+  .complete {
+    color: #bbb;
+    text-decoration: line-through;
   }
 </style>
