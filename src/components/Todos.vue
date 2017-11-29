@@ -19,7 +19,7 @@
         <h2>List</h2>
         <ul class="list-group">
           <li v-for="(todo, index) in todos" :key="index" class="list-group-item">
-            <input type="checkbox" v-model="todo.complete" class="pull-left">
+            <input type="checkbox" v-model="todo.complete" class="pull-left" @click="toggleComplete(todo.id)">
             <span v-bind:class="{ complete: todo.complete }">{{ todo.description }}</span>
             <i @click="remove(todo.id)" class="glyphicon glyphicon-remove pull-right"></i>
           </li>
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <!-- <footer>Total todos: {{todos.length}} || {{todos.filter(x => x.complete).length}} completed</footer> -->
+    <footer>Total todos: {{todos.length}} || {{todos.filter(x => x.complete).length}} completed</footer>
   </div>
 </template>
 
@@ -80,6 +80,21 @@
         this.$http.delete(`${api}/todos/${id}`).then(res => {
         }, err => {
           this.todos = oldTodos
+          console.error(err)
+        })
+      },
+      toggleComplete (id) {
+        const todo = this.todos.find(x => x.id === id)
+        todo.complete = !todo.complete
+        const todoParams = { description: todo.description, complete: todo.complete }
+
+        this.$http.put(`${api}/todos/${id}`, { todo: todoParams }, { headers: { 'content-type': 'application/json' } }).then(res => {
+        }, err => {
+          this.todos = this.todos.map(x => {
+            if (x.id === id) {
+              x.complete = !x.complete
+            }
+          })
           console.error(err)
         })
       }
