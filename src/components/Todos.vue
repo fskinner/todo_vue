@@ -21,37 +21,67 @@
           <li v-for="(todo, index) in todos" :key="index" class="list-group-item">
             <input type="checkbox" v-model="todo.complete" class="pull-left">
             <span v-bind:class="{ complete: todo.complete }">{{ todo.description }}</span>
-            <i @click="remove(index)" class="glyphicon glyphicon-remove pull-right"></i>
+            <i @click="remove(todo.id)" class="glyphicon glyphicon-remove pull-right"></i>
           </li>
         </ul>
       </div>
-      <footer>Total todos: {{todos.length}} || {{todos.filter(x => x.complete).length}} completed</footer>
     </div>
+
+    <!-- <footer>Total todos: {{todos.length}} || {{todos.filter(x => x.complete).length}} completed</footer> -->
   </div>
 </template>
 
 <script>
+  const api = 'http://localhost:4000/api'
+
   export default {
     name: 'Todo',
     data () {
       return {
-        todos: [
-          { description: 'My first task', complete: true },
-          { description: 'Second', complete: false }
-        ],
+        todos: [],
         input: ''
       }
     },
+    mounted () {
+      this.$http.get(`${api}/todos`).then(res => {
+        this.todos = res.body.data
+      }, err => {
+        this.todos = [{ id: 0, description: 'Connect to API', complete: false }]
+        console.error(err)
+      })
+    },
     methods: {
       add () {
-        this.todos.push({ description: this.input, completed: false })
+        const inputValue = this.input
+        const todo = { description: inputValue, complete: false }
+        this.todos.push(todo)
+
+        this.$http.post(`${api}/todos`, { todo }, { headers: { 'content-type': 'application/json' } }).then(res => {
+          this.todos = this.todos.map(x => {
+            if (!x.id) {
+              x.id = res.body.data.id
+            }
+            return x
+          })
+        }, err => {
+          this.input = inputValue
+          console.error(err)
+        })
+
         this.clear()
       },
       clear () {
         this.input = ''
       },
-      remove (index) {
-        this.todos.splice(index, 1)
+      remove (id) {
+        const oldTodos = this.todos
+        this.todos = this.todos.filter(x => x.id !== id)
+
+        this.$http.delete(`${api}/todos/${id}`).then(res => {
+        }, err => {
+          this.todos = oldTodos
+          console.error(err)
+        })
       }
     }
   }
