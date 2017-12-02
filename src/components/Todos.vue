@@ -123,4 +123,7 @@
     text-decoration: line-through;
 
   }
+  .well {
+    margin: 0 20px;
+  }
 </style>
